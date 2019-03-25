@@ -49,7 +49,7 @@ void setup()
 		Debug.setSerialEnabled(true);
 	}
 	
-	rdebugI("Started...");
+	rdebugI("Started...\n");
 
 	// Assign pin for boot as AP
 	delay(1000);
@@ -122,7 +122,7 @@ void setupWiFi()
 	while (WiFi.status() != WL_CONNECTED) {
 		delay(500);
 	}
-	rdebugI("Connected to WiFi");
+	rdebugI("Connected to WiFi\n");
 	
 	client = new WiFiClient();
 	mqtt.begin(ap.config.mqtt, ap.config.mqttPort, *client);
@@ -135,7 +135,7 @@ void setupWiFi()
 
 	// Notify everyone we're here!
 	sendMqttData("Connected!");
-	rdebugI("Connected to MQTT");
+	rdebugI("Connected to MQTT\n");
 }
 
 void mqttMessageReceived(String &topic, String &payload)
@@ -170,7 +170,7 @@ void readHanPort()
 			readHanPort_Kamstrup(listSize);
 			break;
 		default:
-			rdebugW("Meter type %X is unknown", ap.config.meterType);
+			rdebugW("Meter type 0x%02X is unknown\n", ap.config.meterType);
 			delay(1000);
 			break;
 		}
@@ -251,8 +251,8 @@ void readHanPort_Aidon(int listSize)
     // Publish the json to the MQTT server
     char msg[1024];
     root.printTo(msg, 1024);
-    rdebugI("Sending data to MQTT");
-    rdebugD("Payload: %s", msg);
+    rdebugI("Sending data to MQTT\n");
+    rdebugD("Payload: %s\n", msg);
     mqtt.publish(ap.config.mqttPublishTopic, msg);
   } else {
     debugPrintData(hanReader.getBuffer(), 0, hanReader.getBytesRead());
@@ -327,8 +327,8 @@ void readHanPort_Kamstrup(int listSize)
 		// Publish the json to the MQTT server
 		char msg[1024];
 		root.printTo(msg, 1024);
-		rdebugI("Sending data to MQTT");
-		rdebugD("Payload: %s", msg);
+		rdebugI("Sending data to MQTT\n");
+		rdebugD("Payload: %s\n", msg);
 		mqtt.publish(ap.config.mqttPublishTopic, msg);
   } else {
 		debugPrintData(hanReader.getBuffer(), 0, hanReader.getBytesRead());
@@ -409,8 +409,8 @@ void readHanPort_Kaifa(int listSize)
 		// Publish the json to the MQTT server
 		char msg[1024];
 		root.printTo(msg, 1024);
-		rdebugI("Sending data to MQTT");
-		rdebugD("Payload: %s", msg);
+		rdebugI("Sending data to MQTT\n");
+		rdebugD("Payload: %s\n", msg);
 		mqtt.publish(ap.config.mqttPublishTopic, msg);
 	} else {
 		debugPrintData(hanReader.getBuffer(), 0, hanReader.getBytesRead());
@@ -425,7 +425,7 @@ void MQTT_connect()
 
 	if (WiFi.status() != WL_CONNECTED)
 	{
-		rdebugI("Connecting to WiFi network %s", ap.config.ssid);
+		rdebugI("Connecting to WiFi network %s\n", ap.config.ssid);
 		// Make one first attempt at connect, this seems to considerably speed up the first connection
 		WiFi.disconnect();
 		WiFi.begin(ap.config.ssid, ap.config.ssidPassword);
@@ -440,7 +440,7 @@ void MQTT_connect()
 		// If we timed out, disconnect and try again
 		if (vTimeout < millis())
 		{
-			rdebugW("Timeout during connect. WiFi status is: %d", WiFi.status());
+			rdebugW("Timeout during connect. WiFi status is: %d\n", WiFi.status());
 			WiFi.disconnect();
 			WiFi.begin(ap.config.ssid, ap.config.ssidPassword);
 			vTimeout = millis() + WIFI_CONNECTION_TIMEOUT;
@@ -468,7 +468,7 @@ void MQTT_connect()
 		}
 		else
 		{
-			rdebugE("MQTT connection failed, trying again in 5 seconds");
+			rdebugE("MQTT connection failed, trying again in 5 seconds\n");
 
 			// Wait 2 seconds before retrying
 			mqtt.disconnect();
@@ -510,15 +510,17 @@ void sendMqttData(String data)
 
 void debugPrintData(byte *buffer, int start, int length)
 {
+  String hex = "";
   for (int i = start; i < start + length; i++)
   {
-    rdebugD("%01X ", buffer[i]);
+    hex += printf("%02X ", buffer[i]);
     if ((i - start + 1) % 16 == 0)
-      rdebugD("\n");
+      hex += "\n";
     else if ((i - start + 1) % 4 == 0)
-      rdebugD(" ");
+      hex += " ";
     
     yield(); // Let other get some resources too
   }
-  rdebugD("\n");
+  hex += "\n";
+  rdebugD(hex);
 }
