@@ -182,7 +182,7 @@ void readHanPort()
 
 void readHanPort_Aidon(int listSize)
 {
-  if (listSize == (int)Aidon::List1 || listSize == (int)Aidon::List2)
+  if (listSize == (int)Aidon::List1 || listSize == (int)Aidon::List2 || listSize == (int)Aidon::List3)
   {
     // Get the timestamp (as unix time) from the package
     time_t time = hanReader.getPackageTime();
