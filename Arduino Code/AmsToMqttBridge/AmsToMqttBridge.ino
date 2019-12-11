@@ -33,7 +33,7 @@ WiFiClient *client;
 MQTTClient mqtt(384);
 
 // Object used for debugging
-boolean debugEnabled = false;
+boolean debugEnabled = true;
 RemoteDebug Debug;
 
 // The HAN Port reader, used to read serial data and decode DLMS
